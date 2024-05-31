@@ -11,9 +11,9 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 // Uncomment to use Edge Runtime.
-export const config = {
-  runtime: 'edge',
-}
+// export const config = {
+//   runtime: 'edge',
+// }
 
 type State = {
   pieceId: number
