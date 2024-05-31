@@ -61,10 +61,6 @@ const optimizeSvg = (svgString: string) => {
       { name: 'removeNonInheritableGroupAttrs' },
       { name: 'removeUselessStrokeAndFill' },
       { name: 'removeUnusedNS' },
-      // { name: 'cleanupIDs', fn: (data: any) => {
-      //   data.prefix = 'id';
-      //   return data;
-      // }},
       { name: 'cleanupNumericValues', params: { floatPrecision: 1 } },
       { name: 'moveElemsAttrsToGroup' },
       { name: 'moveGroupAttrsToElems' },
