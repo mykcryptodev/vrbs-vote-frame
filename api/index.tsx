@@ -35,7 +35,6 @@ export const app = new Frog<{ State: State }>({
 
  
 app.frame('/:pieceId?', async (c) => {
-  console.log('/piece');
   const { buttonValue, inputText, deriveState } = c
   const { pieceId } = c.req.param()
   const state = deriveState(previousState => {
