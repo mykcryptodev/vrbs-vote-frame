@@ -24,7 +24,7 @@ export const app = new Frog<{ State: State }>({
   basePath: '/api',
   imageAspectRatio: '1:1',
   initialState: {
-    pieceId: 984,
+    pieceId: 989,
   },
   // Supply a Hub to enable frame verification.
   hub: neynar({
