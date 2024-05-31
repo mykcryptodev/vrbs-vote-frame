@@ -28,9 +28,9 @@ export const app = new Frog<{ State: State }>({
     pieceId: 984,
   },
   // Supply a Hub to enable frame verification.
-  hub: neynar({
-    apiKey: process.env.NEYNAR_API_KEY!,
-  }),
+  // hub: neynar({
+  //   apiKey: process.env.NEYNAR_API_KEY!,
+  // }),
 })
 
  
@@ -44,9 +44,12 @@ app.frame('/:pieceId?', async (c) => {
     if (!buttonValue && !inputText) previousState.pieceId = Number(pieceId) || 0
   })
 
-  if (pieceId !== ":pieceId" && !state.pieceId) {
+  console.log({ orig: true, state, pieceId, criteria1: pieceId !== ":pieceId", criteria2: !isNaN(Number(pieceId))})
+  if (pieceId !== ":pieceId" && !isNaN(Number(pieceId))) {
+    console.log('setting state to be pieceId')
     state.pieceId = Number(pieceId)
   }
+  console.log({ state, pieceId })
 
   // check if inputText is a valid numeric string
   if (inputText && isNaN(Number(inputText))) {
