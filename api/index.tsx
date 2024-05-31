@@ -34,13 +34,19 @@ export const app = new Frog<{ State: State }>({
 })
 
  
-app.frame('/', async (c) => {
+app.frame('/:pieceId?', async (c) => {
+  console.log('/piece');
   const { buttonValue, inputText, deriveState } = c
+  const { pieceId } = c.req.param()
   const state = deriveState(previousState => {
     if (buttonValue === 'inc') previousState.pieceId++
     if (buttonValue === 'dec') previousState.pieceId--
     if (inputText) previousState.pieceId = Number(inputText)
+    if (!buttonValue && !inputText) previousState.pieceId = Number(pieceId) || 0
   })
+  if (pieceId && state.pieceId !== Number(pieceId)) {
+    state.pieceId = Number(pieceId)
+  }
 
   // check if inputText is a valid numeric string
   if (inputText && isNaN(Number(inputText))) {
@@ -65,23 +71,24 @@ app.frame('/', async (c) => {
   return c.res({
     action: "/",
     image: (
-      <img src={`${piece.metadata.image}`} />
+      <img src={`${piece.pieceId === BigInt(984) ? 'https://ipfs.io/ipfs/QmerH9HrvizRiqDkGmCTJeHrS9cWUtv6EGwc9KGD6yV4po/Screenshot%202024-05-31%20at%2012.47.20%E2%80%AFAM.png' : piece.metadata.image}`} />
     ),
     imageOptions: {
-      height: 100,
-      width: 100,
+      height: 200,
+      width: 200,
     },
     intents: [
-      <TextInput placeholder="Enter piece id..." />,
+      <TextInput placeholder={`Enter piece id (current: #${piece.pieceId})...`} />,
       <Button>🔍 Search</Button>,
-      <Button value="dec">Previous</Button>,
+      <Button.Link href={`https://warpcast.com/~/compose?text=Vote%20for%20vrb%20%23${piece.pieceId}%21&embeds%5B%5D=https://vrbs-vote-frame.vercel.app/api/${piece.pieceId}`}>Share</Button.Link>,
       <Button value="inc">Next</Button>,
-      <Button.Transaction target="/vote">Vote</Button.Transaction>
+      <Button.Transaction target={`/vote/${piece.pieceId}`}>Vote</Button.Transaction>
     ]
   })
 })
 
-app.transaction('/vote', (c) => {
+app.transaction('/vote/:pieceId', (c) => {
+  const { pieceId } = c.req.param()
   // Send transaction response.
   return c.contract({
     abi: [
@@ -102,7 +109,7 @@ app.transaction('/vote', (c) => {
     chainId: 'eip155:8453',
     functionName: 'vote',
     to: '0x5da551c18109b58831abe8a5b9edc5f9a8e4887c',
-    args: [BigInt(c.previousState.pieceId)],
+    args: [BigInt(pieceId)],
   })
 })
 
