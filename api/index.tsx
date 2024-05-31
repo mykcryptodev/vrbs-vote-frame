@@ -44,7 +44,7 @@ app.frame('/:pieceId?', async (c) => {
     if (!buttonValue && !inputText) previousState.pieceId = Number(pieceId) || 0
   })
 
-  if (pieceId !== ":pieceId" && state.pieceId !== Number(pieceId)) {
+  if (pieceId !== ":pieceId" && !state.pieceId) {
     state.pieceId = Number(pieceId)
   }
 
