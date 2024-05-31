@@ -10,7 +10,9 @@ import { base } from 'thirdweb/chains'
 // Conditionally load dotenv only if not in Edge Runtime
 // @ts-ignore
 if (typeof EdgeFunction === 'undefined') {
-  import('dotenv').then(dotenv => dotenv.config());
+  import('dotenv').then(dotenv => dotenv.config()).catch(err => {
+    console.error('Failed to load dotenv:', err);
+  });
 }
 
 // Uncomment to use Edge Runtime.
