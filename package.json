@@ -1,0 +1,23 @@
+{
+  "name": "vrbs-vote",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "frog vercel-build",
+    "dev": "frog dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "frog": "latest",
+    "hono": "^4",
+    "thirdweb": "^5.25.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vercel": "^32.4.1"
+  }
+}
