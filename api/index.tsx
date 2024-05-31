@@ -6,19 +6,15 @@ import { handle } from 'frog/vercel'
 import { getPieceById } from '../thirdweb/8453/0x5da551c18109b58831abe8a5b9edc5f9a8e4887c.js'
 import { createThirdwebClient, getContract } from 'thirdweb'
 import { base } from 'thirdweb/chains'
+import dotenv from 'dotenv'
 
-// Conditionally load dotenv only if not in Edge Runtime
-// @ts-ignore
-if (typeof EdgeFunction === 'undefined') {
-  import('dotenv').then(dotenv => dotenv.config()).catch(err => {
-    console.error('Failed to load dotenv:', err);
-  });
-}
+
+dotenv.config()
 
 // Uncomment to use Edge Runtime.
-export const config = {
-  runtime: 'edge',
-}
+// export const config = {
+//   runtime: 'edge',
+// }
 
 type State = {
   pieceId: number
