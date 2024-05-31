@@ -1,13 +1,12 @@
 import { Button, Frog, TextInput } from 'frog'
 import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
-// import { neynar } from 'frog/hubs'
+import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
 import { getPieceById } from '../thirdweb/8453/0x5da551c18109b58831abe8a5b9edc5f9a8e4887c.js'
 import { createThirdwebClient, getContract } from 'thirdweb'
 import { base } from 'thirdweb/chains'
 import dotenv from 'dotenv'
-import { neynar } from 'frog/middlewares'
 
 dotenv.config()
 
@@ -28,13 +27,10 @@ export const app = new Frog<{ State: State }>({
     pieceId: 984,
   },
   // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
-}).use(
-  neynar({
+  hub: neynar({
     apiKey: process.env.NEYNAR_API_KEY!,
-    features: ['interactor'],
   }),
-)
+})
 
  
 app.frame('/', async (c) => {
