@@ -77,7 +77,7 @@ app.frame('/:pieceId?', async (c) => {
       width: 200,
     },
     intents: [
-      <TextInput placeholder={`Enter piece id (current: #${piece.pieceId})...`} />,
+      <TextInput placeholder={`#${piece.pieceId}...`} />,
       <Button>🔍 Search</Button>,
       <Button.Link href={`https://warpcast.com/~/compose?text=Vote%20for%20vrb%20%23${piece.pieceId}%21&embeds%5B%5D=https://vrbs-vote-frame.vercel.app/api/${piece.pieceId}`}>Share</Button.Link>,
       <Button value="inc">Next</Button>,
