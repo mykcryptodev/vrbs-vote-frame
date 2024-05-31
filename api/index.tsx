@@ -28,9 +28,9 @@ export const app = new Frog<{ State: State }>({
     pieceId: 984,
   },
   // Supply a Hub to enable frame verification.
-  hub: neynar({
-    apiKey: process.env.NEYNAR_API_KEY!,
-  }),
+  // hub: neynar({
+  //   apiKey: process.env.NEYNAR_API_KEY!,
+  // }),
 })
 
  
@@ -43,7 +43,8 @@ app.frame('/:pieceId?', async (c) => {
     if (inputText) previousState.pieceId = Number(inputText)
     if (!buttonValue && !inputText) previousState.pieceId = Number(pieceId) || 0
   })
-  if (pieceId && state.pieceId !== Number(pieceId)) {
+
+  if (pieceId !== ":pieceId" && state.pieceId !== Number(pieceId)) {
     state.pieceId = Number(pieceId)
   }
 
