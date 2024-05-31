@@ -28,9 +28,9 @@ export const app = new Frog<{ State: State }>({
     pieceId: 984,
   },
   // Supply a Hub to enable frame verification.
-  // hub: neynar({
-  //   apiKey: process.env.NEYNAR_API_KEY!,
-  // }),
+  hub: neynar({
+    apiKey: process.env.NEYNAR_API_KEY!,
+  }),
 })
 
  
