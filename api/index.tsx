@@ -7,7 +7,80 @@ import { getPieceById } from '../thirdweb/8453/0x5da551c18109b58831abe8a5b9edc5f
 import { createThirdwebClient, getContract } from 'thirdweb'
 import { base } from 'thirdweb/chains'
 import dotenv from 'dotenv'
+import { optimize } from 'svgo';
+import { resolveScheme, upload } from "thirdweb/storage";
 
+const saveSvgToCloudAndGetUrl = async (svg: string) => {
+  const client = createThirdwebClient({
+    secretKey: process.env.THIRDWEB_SECRET_KEY!,
+  });
+  // make File from the svg string
+  const file = new File([svg], 'optimized.svg', { type: 'image/svg+xml' });
+  const uri = await upload({
+    client,
+    files: [file],
+  });
+  const url = resolveScheme({
+    client,
+    uri,
+  });
+  return url;
+}
+// Function to decode base64 string
+const decodeBase64 = (data: string) => {
+  if (data.startsWith('data:image/svg+xml;base64,')) {
+    const base64 = data.replace('data:image/svg+xml;base64,', '');
+    const svg = Buffer.from(base64, 'base64').toString('utf-8');
+    return svg;
+  }
+  return data; // Return as is if it's not base64 encoded
+};
+// Function to optimize SVG
+const optimizeSvg = (svgString: string) => {
+  const result = optimize(svgString, {
+    plugins: [
+      { name: 'removeDoctype' },
+      { name: 'removeXMLProcInst' },
+      { name: 'removeComments' },
+      { name: 'removeMetadata' },
+      { name: 'removeTitle' },
+      { name: 'removeDesc' },
+      { name: 'removeUselessDefs' },
+      { name: 'removeEditorsNSData' },
+      { name: 'removeEmptyAttrs' },
+      { name: 'removeHiddenElems' },
+      { name: 'removeEmptyText' },
+      { name: 'removeEmptyContainers' },
+      { name: 'cleanupEnableBackground' },
+      { name: 'minifyStyles' },
+      { name: 'convertStyleToAttrs' },
+      { name: 'convertColors' },
+      { name: 'convertPathData', params: { floatPrecision: 1 } },
+      { name: 'convertTransform' },
+      { name: 'removeUnknownsAndDefaults' },
+      { name: 'removeNonInheritableGroupAttrs' },
+      { name: 'removeUselessStrokeAndFill' },
+      { name: 'removeUnusedNS' },
+      // { name: 'cleanupIDs', fn: (data: any) => {
+      //   data.prefix = 'id';
+      //   return data;
+      // }},
+      { name: 'cleanupNumericValues', params: { floatPrecision: 1 } },
+      { name: 'moveElemsAttrsToGroup' },
+      { name: 'moveGroupAttrsToElems' },
+      { name: 'collapseGroups' },
+      { name: 'mergePaths' },
+      { name: 'convertShapeToPath' },
+      { name: 'sortAttrs' },
+      { name: 'removeDimensions' }
+    ],
+  });
+  return result.data;
+};
+
+// @ts-ignore
+const isEdgeFunction = typeof EdgeFunction !== 'undefined'
+const isProduction = isEdgeFunction || import.meta.env?.MODE !== 'development'
 
 dotenv.config()
 
@@ -27,10 +100,9 @@ export const app = new Frog<{ State: State }>({
   initialState: {
     pieceId: 984,
   },
-  // Supply a Hub to enable frame verification.
-  hub: neynar({
+  hub: isProduction ? neynar({
     apiKey: process.env.NEYNAR_API_KEY!,
-  }),
+  }) : undefined
 })
 
  
@@ -71,10 +143,19 @@ app.frame('/:pieceId?', async (c) => {
     contract,
     pieceId: BigInt(state.pieceId),
   });
+  let optimizedSvg, optimizedSvgUrl;
+  try {
+    const decodedSvg = decodeBase64(piece.metadata.image);
+    optimizedSvg = optimizeSvg(decodedSvg);
+    optimizedSvgUrl = await saveSvgToCloudAndGetUrl(optimizedSvg); // Implement this function based on your cloud storage service
+  } catch (error) {
+    console.error('SVG Optimization failed:', error);
+    optimizedSvg = piece.metadata.image; // Fallback to original if optimization fails
+  }
   return c.res({
     action: "/",
     image: (
-      <img src={`${piece.pieceId === BigInt(984) ? 'https://ipfs.io/ipfs/QmerH9HrvizRiqDkGmCTJeHrS9cWUtv6EGwc9KGD6yV4po/Screenshot%202024-05-31%20at%2012.47.20%E2%80%AFAM.png' : piece.metadata.image}`} />
+      <img src={optimizedSvgUrl} />
     ),
     imageOptions: {
       height: 200,
@@ -116,9 +197,6 @@ app.transaction('/vote/:pieceId', (c) => {
   })
 })
 
-// @ts-ignore
-const isEdgeFunction = typeof EdgeFunction !== 'undefined'
-const isProduction = isEdgeFunction || import.meta.env?.MODE !== 'development'
 devtools(app, isProduction ? { assetsPath: '/.frog' } : { serveStatic })
 
 export const GET = handle(app)
